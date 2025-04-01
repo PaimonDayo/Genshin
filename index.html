@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>原神攻略サイト - キャラクター絞り込み</title>
+  <style>
+    :root {
+      /* 原神風カラーパレット */
+      --primary-color: #4B5D68; /* 深みのある青灰色 */
+      --secondary-color: #F7D488; /* 金色 */
+      --accent-color: #65BECE; /* 水元素色 */
+      --pyro-color: #EF7938; /* 炎元素色 */
+      --cryo-color: #9CD7EA; /* 氷元素色 */
+      --electro-color: #AC7ED3; /* 雷元素色 */
+      --anemo-color: #74C2A8; /* 風元素色 */
+      --geo-color: #F9C23D; /* 岩元素色 */
+      --hydro-color: #4CC2F1; /* 水元素色 */
+      --dendro-color: #A5C83B; /* 草元素色 */
+      --light-color: #F9F6F2; /* 明るい背景色 */
+      --dark-color: #2D3740; /* 暗めのテキスト色 */
+      --border-color: #D3CFC7; /* 淡い境界線 */
+      --background-color: #F5F3EE; /* 背景色 */
+      --card-bg-color: #FFFFFF; /* カード背景 */
+      --box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      --border-radius: 8px;
+      --transition-speed: 0.3s;
+      --rarity-5-color: #BD6932; /* 5つ星の色 */
+      --rarity-4-color: #A479B7; /* 4つ星の色 */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'HYWenHei', 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
+      line-height: 1.6;
+      color: var(--dark-color);
+      background-color: var(--background-color);
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" opacity="0.05"><path d="M0 0 L50 50 L0 100 Z" fill="%234B5D68"/><path d="M100 0 L50 50 L100 100 Z" fill="%23F7D488"/></svg>');
+      background-attachment: fixed;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    /* ヘッダー部分 */
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      position: relative;
+      padding: 2rem 0;
+    }
+
+    header:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, var(--pyro-color), var(--hydro-color), var(--anemo-color), var(--electro-color), var(--dendro-color), var(--cryo-color), var(--geo-color));
+      border-radius: var(--border-radius) var(--border-radius) 0 0;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: var(--dark-color);
+      margin-bottom: 0.5rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-shadow: 2px 2px 0px rgba(0,0,0,0.05);
+      position: relative;
+      display: inline-block;
+    }
+
+    h1:after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 25%;
+      width: 50%;
+      height: 3px;
+      background-color: var(--secondary-color);
+    }
+
+    header p {
+      font-size: 1.2rem;
+      color: var(--primary-color);
+      font-weight: 500;
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      margin: 0 0 15px;
+      color: var(--dark-color);
+      font-weight: 700;
+    }
+
+    /* フィルターエリア */
+    .filter-container {
+      background-color: var(--card-bg-color);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 1.5rem;
+      margin-bottom: 2.5rem;
+      border: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .filter-container:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background-color: var(--secondary-color);
+    }
+
+    .filter-title {
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 0.8rem;
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .filter-group {
+      margin-bottom: 1.2rem;
+      position: relative;
+    }
+
+    .filter-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--dark-color);
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .filter-group select,
+    .filter-group input {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      background-color: var(--light-color);
+      color: var(--dark-color);
+      transition: all var(--transition-speed);
+    }
+
+    .filter-group select {
+      appearance: none;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="6"><path d="M0 0 L6 6 L12 0 Z" fill="%234B5D68"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      padding-right: 2.5rem;
+    }
+
+    .filter-group select:focus,
+    .filter-group input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 2px rgba(101, 190, 206, 0.2);
+    }
+
+    .filter-actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 1.5rem;
+      gap: 1rem;
+    }
+
+    .filter-button {
+      padding: 0.7rem 1.5rem;
+      border: none;
+      border-radius: var(--border-radius);
+      background-color: var(--primary-color);
+      color: white;
+      cursor: pointer;
+      transition: all var(--transition-speed);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .filter-button:hover {
+      background-color: #3A4A55;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .filter-button:before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: rgba(255,255,255,0.1);
+      transform: rotate(45deg);
+      transition: all 0.5s;
+      opacity: 0;
+    }
+
+    .filter-button:hover:before {
+      opacity: 1;
+      transform: rotate(45deg) translate(0, 0);
+    }
+
+    .reset-button {
+      padding: 0.7rem 1.5rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      background-color: transparent;
+      color: var(--primary-color);
+      cursor: pointer;
+      transition: all var(--transition-speed);
+      font-weight: 600;
+    }
+
+    .reset-button:hover {
+      background-color: var(--light-color);
+      border-color: var(--primary-color);
+      transform: translateY(-2px);
+    }
+
+    #toggle-filters {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem;
+      color: var(--primary-color);
+      background-color: transparent;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all var(--transition-speed);
+    }
+
+    #toggle-filters:hover {
+      background-color: var(--light-color);
+    }
+
+    #toggle-filters:after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><path d="M1 3 L5 7 L9 3" stroke="%234B5D68" stroke-width="2" fill="none"/></svg>');
+      background-repeat: no-repeat;
+      transition: transform var(--transition-speed);
+    }
+
+    #toggle-filters.active:after {
+      transform: rotate(180deg);
+    }
+
+    /* 結果エリア */
+    .results-info {
+      background-color: var(--card-bg-color);
+      border-radius: var(--border-radius);
+      padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--box-shadow);
+      border: 1px solid var(--border-color);
+    }
+
+    #results-count {
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .sort-control {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .sort-control label {
+      color: var(--dark-color);
+      font-weight: 500;
+    }
+
+    .sort-control select {
+      padding: 0.5rem 2rem 0.5rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      background-color: var(--light-color);
+      appearance: none;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="6"><path d="M0 0 L6 6 L12 0 Z" fill="%234B5D68"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 0.8rem center;
+      color: var(--dark-color);
+      transition: all var(--transition-speed);
+      font-size: 0.9rem;
+    }
+
+    .sort-control select:focus {
+      outline: none;
+      border-color: var(--accent-color);
+    }
+
+    /* カードのコンテナとレイアウト */
+    .cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    /* カードのスタイル */
+    .card {
+      background-color: var(--card-bg-color);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      overflow: hidden;
+      transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+      border: 1px solid var(--border-color);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    /* キャラクターレアリティによるカードのスタイル変更 */
+    .card.rarity-5 .card-header {
+      background: linear-gradient(135deg, var(--rarity-5-color), #F2D09B);
+    }
+
+    .card.rarity-4 .card-header {
+      background: linear-gradient(135deg, var(--rarity-4-color), #D1C6E1);
+    }
+
+    .card-header {
+      position: relative;
+      color: white;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 200px;
+      justify-content: flex-end;
+      background-size: cover;
+      background-position: center;
+      overflow: hidden;
+    }
+
+    .card-header:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.7));
+      z-index: 1;
+    }
+
+    .card-header h2 {
+      margin: 0;
+      color: white;
+      position: relative;
+      z-index: 2;
+      font-size: 1.5rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    /* 画像のスタイル */
+    .character-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      transition: transform 0.5s;
+    }
+
+    .card:hover .character-image {
+      transform: scale(1.05);
+    }
+
+    .element-icon {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 40px;
+      height: 40px;
+      z-index: 2;
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+    }
+
+    .card-body {
+      padding: 1.5rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.5rem 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .info-label {
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .info-value {
+      text-align: right;
+      color: var(--dark-color);
+    }
+
+    /* 元素カラー */
+    .element-pyro { color: var(--pyro-color); }
+    .element-cryo { color: var(--cryo-color); }
+    .element-hydro { color: var(--hydro-color); }
+    .element-electro { color: var(--electro-color); }
+    .element-anemo { color: var(--anemo-color); }
+    .element-geo { color: var(--geo-color); }
+    .element-dendro { color: var(--dendro-color); }
+
+    /* レアリティ表示 */
+    .rarity-stars {
+      display: flex;
+      justify-content: flex-end;
+      gap: 2px;
+    }
+
+    .star {
+      color: var(--secondary-color);
+      font-size: 1.2rem;
+    }
+
+    /* トグルコンテンツ */
+    .toggle-section {
+      border-top: 1px solid var(--border-color);
+      padding-top: 1rem;
+      margin-top: 1rem;
+    }
+
+    .toggle-button {
+      background: none;
+      border: none;
+      color: var(--primary-color);
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      text-align: left;
+      transition: color var(--transition-speed);
+    }
+
+    .toggle-button:hover {
+      color: var(--accent-color);
+    }
+
+    .toggle-button:after {
+      content: '';
+      width: 14px;
+      height: 14px;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"><path d="M2 5 L7 10 L12 5" stroke="%234B5D68" stroke-width="2" fill="none"/></svg>');
+      background-repeat: no-repeat;
+      transition: transform var(--transition-speed);
+    }
+
+    .toggle-button.active:after {
+      transform: rotate(180deg);
+    }
+
+    .toggle-content {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out;
+      opacity: 0;
+    }
+
+    .toggle-content.active {
+      max-height: 500px;
+      padding: 1rem 0;
+      opacity: 1;
+    }
+
+    /* ローディング状態 */
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      background-color: var(--card-bg-color);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      margin-bottom: 2rem;
+    }
+
+    .loading-spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: var(--primary-color);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1.5rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* エラーメッセージ */
+    .error-message {
+      background-color: #FDD2D2;
+      color: #A42D2D;
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      margin: 1.5rem 0;
+      text-align: center;
+      border-left: 5px solid #A42D2D;
+      font-weight: 500;
+    }
+
+    /* 武器アイコン */
+    .weapon-icon {
+      width: 24px;
+      height: 24px;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+
+    /* 編成例のスタイリング */
+    .formation-value {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 5px;
+    }
+
+    .formation-char {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: center;
+      border: 1px solid var(--border-color);
+    }
+
+    /* 聖遺物のスタイリング */
+    .artifact-content, .beginner-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .artifact-item {
+      background-color: var(--light-color);
+      padding: 10px;
+      border-radius: var(--border-radius);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .artifact-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-size: cover;
+    }
+
+    /* レスポンシブ調整 */
+    @media (max-width: 1024px) {
+      .filter-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      }
+      
+      .cards-container {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      .filter-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+      }
+      
+      .cards-container {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+      }
+      
+      .filter-actions {
+        flex-direction: column;
+      }
+      
+      .filter-button, .reset-button {
+        width: 100%;
+      }
+      
+      .card-header {
+        min-height: 180px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .cards-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .results-info {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+        padding: 1rem;
+      }
+      
+      .sort-control {
+        width: 100%;
+      }
+      
+      .sort-control select {
+        flex-grow: 1;
+      }
+      
+      .filter-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .filter-group select, 
+      .filter-group input {
+        font-size: 16px;
+      }
+      
+      header h1 {
+        font-size: 2rem;
+      }
+      
+      header p {
+        font-size: 1rem;
+      }
+      
+      .card-body {
+        padding: 1rem;
+      }
+      
+      .info-grid {
+        gap: 0.3rem 0.5rem;
+      }
+    }
+
+    /* キャラクターイメージのプレースホルダー */
+    .character-placeholder {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      background-color: var(--light-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .character-placeholder:before {
+      content: '画像読込中';
+      color: var(--secondary-color);
+      font-size: 1rem;
+    }
+
+    /* 表示アニメーション */
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* トグルボタンの強調表示 */
+    .toggle-section {
+      position: relative;
+    }
+
+    .toggle-section:before {
+      content: '';
+      position: absolute;
+      left: -1.5rem;
+      top: 1rem;
+      width: 3px;
+      height: 0;
+      background-color: var(--accent-color);
+      transition: height 0.3s ease;
+    }
+
+    .toggle-section.active:before {
+      height: calc(100% - 2rem);
+    }
+
+    /* 元素別カラーアクセント */
+    .pyro-accent { border-top: 3px solid var(--pyro-color); }
+    .cryo-accent { border-top: 3px solid var(--cryo-color); }
+    .hydro-accent { border-top: 3px solid var(--hydro-color); }
+    .electro-accent { border-top: 3px solid var(--electro-color); }
+    .anemo-accent { border-top: 3px solid var(--anemo-color); }
+    .geo-accent { border-top: 3px solid var(--geo-color); }
+    .dendro-accent { border-top: 3px solid var(--dendro-color); }
+
+    /* ナビゲーションバー */
+    .nav-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: var(--primary-color);
+      padding: 0.8rem 1rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+    }
+
+    .nav-list li {
+      position: relative;
+    }
+
+    .nav-list a {
+      color: var(--light-color);
+      text-decoration: none;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: color var(--transition-speed);
+      padding: 0.5rem;
+    }
+
+    .nav-list a:hover,
+    .nav-list a.active {
+      color: var(--secondary-color);
+    }
+
+    /* ドロップダウンメニュー */
+    .nav-dropdown {
+      display: none;
+      position: absolute;
+      top: 110%;
+      left: 0;
+      background-color: var(--card-bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      min-width: 180px;
+      z-index: 1000;
+    }
+
+    .nav-dropdown li {
+      padding: 0.5rem 1rem;
+    }
+
+    .nav-dropdown li a {
+      color: var(--dark-color);
+    }
+
+    .nav-dropdown li a:hover {
+      color: var(--accent-color);
+    }
+
+    .nav-list li:hover .nav-dropdown {
+      display: block;
+    }
+
+    /* フッター */
+    footer {
+      background-color: var(--primary-color);
+      color: var(--light-color);
+      text-align: center;
+      padding: 2rem 1rem;
+      margin-top: 3rem;
+      border-top: 5px solid var(--secondary-color);
+    }
+
+    footer .footer-links {
+      list-style: none;
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin: 1rem 0;
+    }
+
+    footer .footer-links li a {
+      color: var(--light-color);
+      text-decoration: none;
+      transition: color var(--transition-speed);
+    }
+
+    footer .footer-links li a:hover {
+      color: var(--secondary-color);
+    }
+
+    footer p {
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    /* モーダルウィンドウ */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-speed);
+      z-index: 2000;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-content {
+      background-color: var(--card-bg-color);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      max-width: 600px;
+      width: 90%;
+      padding: 2rem;
+      position: relative;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--dark-color);
+      cursor: pointer;
+      transition: color var(--transition-speed);
+    }
+
+    .modal-close:hover {
+      color: var(--accent-color);
+    }
+
+    /* ツールチップ */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+    }
+
+    .tooltip .tooltip-text {
+      visibility: hidden;
+      width: 200px;
+      background-color: var(--dark-color);
+      color: var(--light-color);
+      text-align: center;
+      padding: 0.5rem;
+      border-radius: var(--border-radius);
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity var(--transition-speed);
+      z-index: 1500;
+    }
+
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* サイドバー */
+    .sidebar {
+      background-color: var(--card-bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: 1rem;
+      box-shadow: var(--box-shadow);
+      max-width: 300px;
+      margin-right: 2rem;
+    }
+
+    .sidebar h3 {
+      margin-bottom: 1rem;
+      color: var(--primary-color);
+      font-weight: 700;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 0.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      .layout-with-sidebar {
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        margin: 0 0 2rem 0;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>原神攻略サイト</h1>
+      <p>キャラクター絞り込み検索</p>
+    </header>
+    
+    <!-- フィルターエリア -->
+    <section class="filter-container">
+      <div class="filter-title">
+        <h2>フィルター</h2>
+        <button id="toggle-filters" class="toggle-button">フィルターを閉じる</button>
+      </div>
+      
+      <div id="filters-content">
+        <div class="filter-grid">
+          <div class="filter-group">
+            <label for="name-search">キャラクター名</label>
+            <input type="text" id="name-search" placeholder="キャラクター名で検索">
+          </div>
+          
+          <div class="filter-group">
+            <label for="formation-select">おすすめ編成</label>
+            <select id="formation-select">
+              <option value="all">すべて</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="rarity-select">レアリティ</label>
+            <select id="rarity-select">
+              <option value="all">すべて</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="element-select">元素</label>
+            <select id="element-select">
+              <option value="all">すべて</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="weapon-select">武器種</label>
+            <select id="weapon-select">
+              <option value="all">すべて</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="country-select">国</label>
+            <select id="country-select">
+              <option value="all">すべて</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="role-select">役割</label>
+            <select id="role-select">
+              <option value="all">すべて</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="filter-actions">
+          <button id="apply-filters" class="filter-button">フィルターを適用</button>
+          <button id="reset-filters" class="reset-button">リセット</button>
+        </div>
+      </div>
+    </section>
+    
+    <!-- 結果情報 -->
+    <section class="results-info">
+      <div id="results-count">キャラクター: 0件</div>
+      
+      <div class="sort-control">
+        <label for="sort-select">並び替え:</label>
+        <select id="sort-select">
+          <option value="name-asc">名前 (A-Z)</option>
+          <option value="name-desc">名前 (Z-A)</option>
+          <option value="rarity-desc">レアリティ (高い順)</option>
+          <option value="rarity-asc">レアリティ (低い順)</option>
+        </select>
+      </div>
+    </section>
+    
+    <!-- データ読み込み中の表示 -->
+    <div id="loading" class="loading">
+      <div class="loading-spinner"></div>
+      <p>データを読み込んでいます...</p>
+    </div>
+    
+    <!-- エラーメッセージ -->
+    <div id="error-message" class="error-message" style="display: none;">
+      データの読み込みに失敗しました。後ほど再度お試しください。
+    </div>
+    
+    <!-- キャラクターカード表示エリア -->
+    <div id="character-container" class="cards-container"></div>
+  </div>
+  
+  <!-- テンプレート: カード -->
+  <template id="card-template">
+    <div class="card">
+      <div class="card-header">
+        <!-- キャラクター画像 -->
+        <img class="character-image" src="" alt="">
+        <h2 class="character-name"></h2>
+      </div>
+      <div class="card-body">
+        <div class="info-grid">
+          <span class="info-label">レアリティ:</span>
+          <span class="info-value rarity-value"></span>
+          
+          <span class="info-label">元素:</span>
+          <span class="info-value element-value"></span>
+          
+          <span class="info-label">武器種:</span>
+          <span class="info-value weapon-value"></span>
+          
+          <span class="info-label">国:</span>
+          <span class="info-value country-value"></span>
+          
+          <span class="info-label">重要ステータス:</span>
+          <span class="info-value stats-value"></span>
+          
+          <span class="info-label">編成例:</span>
+          <span class="info-value formation-value"></span>
+        </div>
+        
+        <div class="toggle-section role-section">
+          <button class="toggle-button role-toggle">
+            <span class="toggle-title">役割: </span>
+          </button>
+          <div class="toggle-content role-content"></div>
+        </div>
+        
+        <div class="toggle-section artifact-section">
+          <button class="toggle-button artifact-toggle">
+            <span class="toggle-title">聖遺物: </span>
+          </button>
+          <div class="toggle-content artifact-content"></div>
+        </div>
+        
+        <div class="toggle-section beginner-section">
+          <button class="toggle-button beginner-toggle">
+            <span class="toggle-title">聖遺物(初心者): </span>
+          </button>
+          <div class="toggle-content beginner-content"></div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    // 定数定義
+    const CONFIG = {
+      dataUrl: "https://opensheet.vercel.app/1DceOkRiDUwUjw0tz-LxcyJx7Wl7ONCot_lzSA6sFuYI/Character",
+      debounceDelay: 300, // 検索入力のデバウンス時間（ミリ秒）
+      toggleAnimationDuration: 300, // トグルアニメーションの時間（ミリ秒）
+    };
+
+    // アプリケーションの状態を管理するオブジェクト
+    const AppState = {
+      charactersData: [],
+      filteredData: [],
+      filters: {
+        name: "",
+        formation: "all",
+        rarity: "all",
+        element: "all",
+        weapon: "all",
+        country: "all",
+        role: "all"
+      },
+      sortOption: "name-asc",
+      isLoading: true,
+      hasError: false
+    };
+
+    // DOM要素の参照を保持するオブジェクト
+    const DOMElements = {
+      // メインコンテナ
+      characterContainer: document.getElementById("character-container"),
+      // フィルター要素
+      nameSearch: document.getElementById("name-search"),
+      formationSelect: document.getElementById("formation-select"),
+      raritySelect: document.getElementById("rarity-select"),
+      elementSelect: document.getElementById("element-select"),
+      weaponSelect: document.getElementById("weapon-select"),
+      countrySelect: document.getElementById("country-select"),
+      roleSelect: document.getElementById("role-select"),
+      // ボタン
+      applyFiltersBtn: document.getElementById("apply-filters"),
+      resetFiltersBtn: document.getElementById("reset-filters"),
+      toggleFiltersBtn: document.getElementById("toggle-filters"),
+      // その他UI要素
+      filtersContent: document.getElementById("filters-content"),
+      sortSelect: document.getElementById("sort-select"),
+      resultsCount: document.getElementById("results-count"),
+      loading: document.getElementById("loading"),
+      errorMessage: document.getElementById("error-message"),
+      // テンプレート
+      cardTemplate: document.getElementById("card-template")
+    };
+
+    /**
+     * データを取得する関数
+     * @returns {Promise<Array>} 取得したデータ
+     */
+    async function fetchData() {
+      try {
+        AppState.isLoading = true;
+        AppState.hasError = false;
+        updateUI();
+        
+        const response = await fetch(CONFIG.dataUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error("データ取得エラー:", error);
+        AppState.hasError = true;
+        return [];
+      } finally {
+        AppState.isLoading = false;
+        updateUI();
+      }
+    }
+
+    /**
+     * フィルタリングオプションをセレクトボックスに追加する
+     */
+    function populateFilterOptions() {
+      // フィルターオプション用のセット（重複値を排除）
+      const filterOptions = {
+        formations: new Set(),
+        rarities: new Set(),
+        elements: new Set(),
+        weapons: new Set(),
+        countries: new Set(),
+        roles: new Set()
+      };
+      
+      // データからフィルタオプションを抽出
+      AppState.charactersData.forEach(character => {
+        if (character["編成例"]) {
+          character["編成例"].split(",").map(val => val.trim()).forEach(val => {
+            if (val) filterOptions.formations.add(val);
+          });
+        }
+        
+        if (character["レアリティ"]) filterOptions.rarities.add(character["レアリティ"]);
+        if (character["元素"]) filterOptions.elements.add(character["元素"]);
+        if (character["武器種"]) filterOptions.weapons.add(character["武器種"]);
+        if (character["国"]) filterOptions.countries.add(character["国"]);
+        if (character["役割"]) filterOptions.roles.add(character["役割"]);
+      });
+      
+      // セレクトボックスにオプションを追加するヘルパー関数
+      function addOptionsToSelect(selectElement, options) {
+        // 既存のオプションをクリア（最初の「すべて」オプションは残す）
+        while (selectElement.options.length > 1) {
+          selectElement.remove(1);
+        }
+        
+        // ソートしたオプションを追加
+        Array.from(options).sort().forEach(option => {
+          const optionElement = document.createElement("option");
+          optionElement.value = option.toLowerCase();
+          optionElement.textContent = option;
+          selectElement.appendChild(optionElement);
+        });
+      }
+      
+      // 各セレクトボックスにオプションを追加
+      addOptionsToSelect(DOMElements.formationSelect, filterOptions.formations);
+      addOptionsToSelect(DOMElements.raritySelect, filterOptions.rarities);
+      addOptionsToSelect(DOMElements.elementSelect, filterOptions.elements);
+      addOptionsToSelect(DOMElements.weaponSelect, filterOptions.weapons);
+      addOptionsToSelect(DOMElements.countrySelect, filterOptions.countries);
+      addOptionsToSelect(DOMElements.roleSelect, filterOptions.roles);
+    }
+
+    /**
+     * 全てのキャラクターに対してフィルタを適用する
+     */
+    function applyFilters() {
+      // フィルタ条件を取得
+      const filters = {
+        name: DOMElements.nameSearch.value.toLowerCase().trim(),
+        formation: DOMElements.formationSelect.value,
+        rarity: DOMElements.raritySelect.value,
+        element: DOMElements.elementSelect.value,
+        weapon: DOMElements.weaponSelect.value,
+        country: DOMElements.countrySelect.value,
+        role: DOMElements.roleSelect.value
+      };
+      
+      // ステートを更新
+      AppState.filters = filters;
+      
+      // フィルター適用
+      AppState.filteredData = AppState.charactersData.filter(character => {
+        // 名前フィルター (部分一致)
+        if (filters.name && !character["キャラクター名"].toLowerCase().includes(filters.name)) {
+          return false;
+        }
+        
+        // 編成フィルター
+        if (filters.formation !== "all" && character["編成例"]) {
+          const formations = character["編成例"].toLowerCase().split(",").map(f => f.trim());
+          if (!formations.includes(filters.formation)) {
+            return false;
+          }
+        }
+        
+        // その他のフィルター (完全一致)
+        if (filters.rarity !== "all" && character["レアリティ"]?.toLowerCase() !== filters.rarity) {
+          return false;
+        }
+        
+        if (filters.element !== "all" && character["元素"]?.toLowerCase() !== filters.element) {
+          return false;
+        }
+        
+        if (filters.weapon !== "all" && character["武器種"]?.toLowerCase() !== filters.weapon) {
+          return false;
+        }
+        
+        if (filters.country !== "all" && character["国"]?.toLowerCase() !== filters.country) {
+          return false;
+        }
+        
+        if (filters.role !== "all" && character["役割"]?.toLowerCase() !== filters.role) {
+          return false;
+        }
+        
+        return true;
+      });
+      
+      // ソートを適用
+      sortCharacters();
+      
+      // 結果を表示
+      displayCharacters();
+      updateResultsCount();
+    }
+
+    /**
+     * デバウンス関数
+     * 連続して呼ばれる処理を一定時間後にまとめて1回だけ実行する
+     */
+    function debounce(func, delay) {
+      let timeoutId;
+      return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          func.apply(this, args);
+        }, delay);
+      };
+    }
+
+    /**
+     * キャラクターをソートする
+     */
+    function sortCharacters() {
+      const sortOption = DOMElements.sortSelect.value;
+      AppState.sortOption = sortOption;
+      
+      AppState.filteredData.sort((a, b) => {
+        switch (sortOption) {
+          case "name-asc":
+            return a["キャラクター名"].localeCompare(b["キャラクター名"], 'ja');
+          case "name-desc":
+            return b["キャラクター名"].localeCompare(a["キャラクター名"], 'ja');
+          case "rarity-desc": {
+            // レアリティを数値化して比較（例: ★★★★★ → 5）
+            const rarityA = a["レアリティ"]?.length || 0;
+            const rarityB = b["レアリティ"]?.length || 0;
+            return rarityB - rarityA;
+          }
+          case "rarity-asc": {
+            const rarityA = a["レアリティ"]?.length || 0;
+            const rarityB = b["レアリティ"]?.length || 0;
+            return rarityA - rarityB;
+          }
+          default:
+            return 0;
+        }
+      });
+    }
+
+    /**
+     * カードを作成してDOMに追加する
+     */
+    function displayCharacters() {
+      DOMElements.characterContainer.innerHTML = "";
+      
+      if (AppState.filteredData.length === 0) {
+        const noResultsElement = document.createElement("div");
+        noResultsElement.className = "no-results";
+        noResultsElement.textContent = "条件に一致するキャラクターが見つかりませんでした。";
+        DOMElements.characterContainer.appendChild(noResultsElement);
+        return;
+      }
+      
+      AppState.filteredData.forEach(character => {
+        const cardElement = createCardElement(character);
+        DOMElements.characterContainer.appendChild(cardElement);
+      });
+    }
+
+    /**
+     * キャラクターカードのDOM要素を作成する
+     * @param {Object} character キャラクターデータ
+     * @returns {HTMLElement} カード要素
+     */
+    function createCardElement(character) {
+      // テンプレートからクローンを作成
+      const template = DOMElements.cardTemplate;
+      const card = document.importNode(template.content, true);
+      
+      // データを安全に取得するヘルパー関数
+      const safeGet = (obj, key) => obj[key] || "";
+      
+      // 画像の設定（画像ファイル名は「画像ファイル名」カラムの値）
+      const imageFileName = safeGet(character, "画像ファイル名");
+      if (imageFileName) {
+        const imgElement = card.querySelector(".character-image");
+        imgElement.src = `images/${imageFileName}`;
+        imgElement.alt = safeGet(character, "キャラクター名");
+      }
+      
+      // 基本情報をセット
+      card.querySelector(".character-name").textContent = safeGet(character, "キャラクター名");
+      card.querySelector(".rarity-value").textContent = safeGet(character, "レアリティ");
+      card.querySelector(".element-value").textContent = safeGet(character, "元素");
+      card.querySelector(".weapon-value").textContent = safeGet(character, "武器種");
+      card.querySelector(".country-value").textContent = safeGet(character, "国");
+      card.querySelector(".stats-value").textContent = safeGet(character, "重要ステータス");
+      card.querySelector(".formation-value").textContent = safeGet(character, "編成例");
+      
+      // 役割セクション
+      const roleToggle = card.querySelector(".role-toggle");
+      const roleToggleTitle = roleToggle.querySelector(".toggle-title");
+      const roleContent = card.querySelector(".role-content");
+      
+      roleToggleTitle.textContent = `役割: ${safeGet(character, "役割")}`;
+      roleContent.textContent = safeGet(character, "役割説明");
+      
+      // 聖遺物セクション
+      const artifactToggle = card.querySelector(".artifact-toggle");
+      const artifactToggleTitle = artifactToggle.querySelector(".toggle-title");
+      const artifactContent = card.querySelector(".artifact-content");
+      
+      artifactToggleTitle.textContent = `聖遺物: ${safeGet(character, "聖遺物")}`;
+      artifactContent.textContent = safeGet(character, "聖遺物説明");
+      
+      // 初心者向け聖遺物セクション
+      const beginnerToggle = card.querySelector(".beginner-toggle");
+      const beginnerToggleTitle = beginnerToggle.querySelector(".toggle-title");
+      const beginnerContent = card.querySelector(".beginner-content");
+      
+      beginnerToggleTitle.textContent = `聖遺物(初心者): ${safeGet(character, "聖遺物(初心者)")}`;
+      beginnerContent.textContent = safeGet(character, "聖遺物説明(初心者)");
+      
+      // トグルボタンのイベントリスナーを設定
+      setupToggleListeners(card);
+      
+      // データ属性を設定（フィルタリング用）
+      const cardElement = card.querySelector(".card");
+      cardElement.dataset.name = safeGet(character, "キャラクター名").toLowerCase();
+      cardElement.dataset.rarity = safeGet(character, "レアリティ").toLowerCase();
+      cardElement.dataset.element = safeGet(character, "元素").toLowerCase();
+      cardElement.dataset.weapon = safeGet(character, "武器種").toLowerCase();
+      cardElement.dataset.country = safeGet(character, "国").toLowerCase();
+      cardElement.dataset.role = safeGet(character, "役割").toLowerCase();
+      
+      if (character["編成例"]) {
+        const formations = character["編成例"].toLowerCase().split(",").map(s => s.trim());
+        cardElement.dataset.formations = formations.join(",");
+      }
+      
+      return cardElement;
+    }
+
+    /**
+     * カード内のトグルボタンにイベントリスナーを設定
+     */
+    function setupToggleListeners(cardElement) {
+      const toggleButtons = cardElement.querySelectorAll(".toggle-button");
+      
+      toggleButtons.forEach(button => {
+        const content = button.nextElementSibling;
+        
+        button.addEventListener("click", () => {
+          // 他のボタン状態をチェック
+          const wasActive = button.classList.contains("active");
+          
+          // 現在のボタン状態を切り替え
+          button.classList.toggle("active");
+          
+          if (!wasActive) {
+            content.classList.add("active");
+            content.style.maxHeight = content.scrollHeight + "px";
+          } else {
+            content.style.maxHeight = "0px";
+            // アニメーション終了後にクラスを削除
+            setTimeout(() => {
+              content.classList.remove("active");
+            }, CONFIG.toggleAnimationDuration);
+          }
+        });
+      });
+    }
+
+    /**
+     * フィルターエリアの表示/非表示を切り替える
+     */
+    function toggleFiltersVisibility() {
+      const filtersContent = DOMElements.filtersContent;
+      const button = DOMElements.toggleFiltersBtn;
+      
+      if (filtersContent.style.display === "none") {
+        filtersContent.style.display = "block";
+        button.textContent = "フィルターを閉じる";
+      } else {
+        filtersContent.style.display = "none";
+        button.textContent = "フィルターを開く";
+      }
+    }
+
+    /**
+     * フィルターをリセットする
+     */
+    function resetFilters() {
+      // 入力フィールドをリセット
+      DOMElements.nameSearch.value = "";
+      DOMElements.formationSelect.value = "all";
+      DOMElements.raritySelect.value = "all";
+      DOMElements.elementSelect.value = "all";
+      DOMElements.weaponSelect.value = "all";
+      DOMElements.countrySelect.value = "all";
+      DOMElements.roleSelect.value = "all";
+      
+      // ソートもデフォルトに戻す
+      DOMElements.sortSelect.value = "name-asc";
+      
+      // フィルター適用
+      applyFilters();
+    }
+
+    /**
+     * 結果カウントを更新する
+     */
+    function updateResultsCount() {
+      DOMElements.resultsCount.textContent = `キャラクター: ${AppState.filteredData.length}件`;
+    }
+
+    /**
+     * アプリケーションのUIを更新する
+     */
+    function updateUI() {
+      // ローディング状態を反映
+      DOMElements.loading.style.display = AppState.isLoading ? "block" : "none";
+      
+      // エラー状態を反映
+      DOMElements.errorMessage.style.display = AppState.hasError ? "block" : "none";
+      
+      // キャラクターコンテナの表示状態を更新
+      DOMElements.characterContainer.style.display = 
+        (!AppState.isLoading && !AppState.hasError) ? "grid" : "none";
+    }
+
+    /**
+     * イベントリスナーを設定する
+     */
+    function setupEventListeners() {
+      // フィルター変更時のイベント
+      const debouncedApplyFilters = debounce(applyFilters, CONFIG.debounceDelay);
+      
+      DOMElements.nameSearch.addEventListener("input", debouncedApplyFilters);
+      DOMElements.formationSelect.addEventListener("change", applyFilters);
+      DOMElements.raritySelect.addEventListener("change", applyFilters);
+      DOMElements.elementSelect.addEventListener("change", applyFilters);
+      DOMElements.weaponSelect.addEventListener("change", applyFilters);
+      DOMElements.countrySelect.addEventListener("change", applyFilters);
+      DOMElements.roleSelect.addEventListener("change", applyFilters);
+      
+      // ソート変更時
+      DOMElements.sortSelect.addEventListener("change", () => {
+        sortCharacters();
+        displayCharacters();
+      });
+      
+      // ボタンイベント
+      DOMElements.applyFiltersBtn.addEventListener("click", applyFilters);
+      DOMElements.resetFiltersBtn.addEventListener("click", resetFilters);
+      DOMElements.toggleFiltersBtn.addEventListener("click", toggleFiltersVisibility);
+    }
+
+    /**
+     * アプリケーション初期化
+     */
+    async function initializeApp() {
+      setupEventListeners();
+      
+      // データ取得
+      const data = await fetchData();
+      if (data.length > 0) {
+        AppState.charactersData = data;
+        AppState.filteredData = [...data];
+        
+        // フィルターオプションを設定
+        populateFilterOptions();
+        
+        // 初期表示
+        sortCharacters();
+        displayCharacters();
+        updateResultsCount();
+      }
+    }
+
+    // アプリケーション起動
+    document.addEventListener("DOMContentLoaded", initializeApp);
+  </script>
+</body>
+</html>
